@@ -10,6 +10,7 @@ const path = require('path');
 const User = require("./models/user");
 const Admin= require("./models/admin");
 const Asset = require("./models/assets")
+const jwt = require('jsonwebtoken');
 
 const app = express();
 app.use(cors());
@@ -23,6 +24,12 @@ mongoose.connect("mongodb+srv://yuvan:123@cluster1.dfzdlya.mongodb.net/dams", {
 .catch(error => console.error("Error connecting to MongoDB:", error));
 
 const adminSecret = "admin@123"
+const secretKey = 'mySecretKeyForJWT';
+
+function generateToken(user) {
+  return jwt.sign({ userId: user._id, email: user.email },secretKey , { expiresIn: '1m' });
+}
+
 
 app.post("/register", async (req, res) => {
   const { username, password, email, department } = req.body;
@@ -35,8 +42,9 @@ app.post("/register", async (req, res) => {
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ username, email, password: hashedPassword, department });
+    const token = generateToken(newUser);
     await newUser.save();
-    res.json({ message: "Registration successful! please proceed to login" });
+    res.json({ message: "Registration successful! please proceed to login" ,token});
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred during registration." });
@@ -59,9 +67,10 @@ app.post("/userlogin", async (req, res) => {
       return;
     }
 
+    const token = generateToken(user);
     user.status = 'online';
     await user.save();
-    res.json({ message: "Login successful!" });
+    res.json({ message: "Login successful!" ,token});
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred during login." });
@@ -83,8 +92,9 @@ app.post("/adminregister", async (req, res) => {
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const adminUser = new Admin({ username, email, password: hashedPassword, department });
+    const token = generateToken(adminUser);
     await adminUser.save();
-    res.json({ message: "Registration successful! Please proceed to login." });
+    res.json({ message: "Registration successful! Please proceed to login.", token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred during registration." });
@@ -101,15 +111,14 @@ app.post("/adminlogin", async (req, res) => {
     }
     const user = await Admin.findOne({ email });
     if (!user) {
-      res.status(401).json({ error: "Invalid credentials." });
-      return;
+      return res.status(401).json({ error: "Invalid credentials." });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      res.status(401).json({ error: "Invalid credentials." });
-      return;
+      return res.status(401).json({ error: "Invalid credentials." });
     }
+    const token = generateToken(user);
 
     user.status = 'online';
     await user.save();
@@ -142,6 +151,21 @@ app.post("/logout", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred during logout." });
+  }
+});
+
+app.post("/validateToken", async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    // Verify the token
+    jwt.verify(token, secretKey);
+
+    // Token is valid
+    res.json({ valid: true });
+  } catch (error) {
+    // Token is invalid/expired
+    res.json({ valid: false });
   }
 });
 

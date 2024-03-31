@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
   department: { type: String },
   status: { type: String, default: 'offline' },
   profilePicture: { type: String },
+  token: {type: String},
   requestedAssets:[{
     assetId: {type: String},
     borrowedAt: { type: Date },
