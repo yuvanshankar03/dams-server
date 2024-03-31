@@ -27,7 +27,7 @@ const adminSecret = "admin@123"
 const secretKey = 'mySecretKeyForJWT';
 
 function generateToken(user) {
-  return jwt.sign({ userId: user._id, email: user.email },secretKey , { expiresIn: '1m' });
+  return jwt.sign({ userId: user._id, email: user.email },secretKey , { expiresIn: '1h' });
 }
 
 
