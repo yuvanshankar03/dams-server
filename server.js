@@ -44,7 +44,7 @@ app.post("/register", async (req, res) => {
     const newUser = new User({ username, email, password: hashedPassword, department });
     const token = generateToken(newUser);
     await newUser.save();
-    res.json({ message: "Registration successful! please proceed to login" ,token});
+    res.json({ message: "Registration successful!" ,token});
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred during registration." });
@@ -94,7 +94,7 @@ app.post("/adminregister", async (req, res) => {
     const adminUser = new Admin({ username, email, password: hashedPassword, department });
     const token = generateToken(adminUser);
     await adminUser.save();
-    res.json({ message: "Registration successful! Please proceed to login.", token });
+    res.json({ message: "Registration successful!.", token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred during registration." });
@@ -122,7 +122,7 @@ app.post("/adminlogin", async (req, res) => {
 
     user.status = 'online';
     await user.save();
-    res.json({ message: "Login successful!" });
+    res.json({ message: "Login successful!", token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred during login." });
