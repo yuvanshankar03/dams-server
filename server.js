@@ -16,7 +16,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect("mongodb+srv://yuvan:123@cluster1.dfzdlya.mongodb.net/dams", {
+mongoose.connect("mongodb+srv://yuvan:yUvAn123@cluster1.dfzdlya.mongodb.net/dams", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
