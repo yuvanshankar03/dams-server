@@ -1235,4 +1235,6 @@ app.put('/mark-notification-read/:notificationId', async (req, res) => {
 
 app.listen(3001, () => {
   console.log("Server is running on port 3001");
+  console.log("Server is live");
 });
+
